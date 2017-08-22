@@ -1,21 +1,19 @@
 package uk.co.bbc.electionscoreboard.dto;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * Created by Chris on 13-Aug-17.
  */
-public class NationalParty implements Comparable<NationalParty> {
-    private String partyCode;
+@XmlRootElement
+public class NationalPoliticalParty {
+    private PoliticalPartyCode partyCode;
     private Integer seats = new Integer(0);
     private Long overallVotes = new Long(0l);
     private Float overallShare = new Float(0.0f);
 
-    public void setPartyCode(String partyCode) {
+    public void setPartyCode(PoliticalPartyCode partyCode) {
         this.partyCode = partyCode;
-    }
-
-    @Override
-    public int compareTo(NationalParty o) {
-        return this.seats.compareTo(o.seats);
     }
 
     public Integer getSeats() {
@@ -26,7 +24,7 @@ public class NationalParty implements Comparable<NationalParty> {
         this.seats = seats;
     }
 
-    public String getPartyCode() {
+    public PoliticalPartyCode getPartyCode() {
         return partyCode;
     }
 
@@ -35,7 +33,7 @@ public class NationalParty implements Comparable<NationalParty> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        NationalParty that = (NationalParty) o;
+        NationalPoliticalParty that = (NationalPoliticalParty) o;
 
         return partyCode.equals(that.partyCode);
     }
@@ -63,5 +61,13 @@ public class NationalParty implements Comparable<NationalParty> {
 
     public void setOverallShare(Float overallShare) {
         this.overallShare = overallShare;
+    }
+
+    public void addSeats(Integer addedSeats) {
+        this.seats = new Integer(this.seats.intValue() + addedSeats);
+    }
+
+    public void addOverallShare(Float addedOverallShare) {
+        this.overallShare = new Float(this.getOverallShare() + addedOverallShare);
     }
 }

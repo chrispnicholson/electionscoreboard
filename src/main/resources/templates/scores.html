@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Election Scores</title>
+</head>
+<body>
+<script type="text/javascript">
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "http://localhost:8080/scores?format=application/xml", false);
+
+        xhr.send();
+        document.write(xhr.status+"<br>");
+        document.write(xhr.statusText);
+</script>
+</body>
+</html>

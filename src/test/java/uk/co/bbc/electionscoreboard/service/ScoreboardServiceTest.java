@@ -4,11 +4,13 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.co.bbc.electionscoreboard.dto.*;
 
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static uk.co.bbc.electionscoreboard.dto.PoliticalPartyCode.*;
+import static uk.co.bbc.electionscoreboard.dto.PoliticalPartyCode.LAB;
+import static uk.co.bbc.electionscoreboard.dto.PoliticalPartyCode.OTH;
 
 /**
  * Created by Chris on 13-Aug-17.
@@ -144,16 +146,16 @@ public class ScoreboardServiceTest {
         scoreboardService.addConstituencyResults(constituencyResultsOne);
         Scoreboard scoreboard = scoreboardService.getScoreboard();
 
-        assertEquals(2, scoreboard.getNationalParties().size());
-        assertNotNull( scoreboard.getNationalParties().get("LAB"));
-        assertNotNull( scoreboard.getNationalParties().get("OTHERS"));
-        assertEquals("LAB", scoreboard.getNationalParties().firstKey());
-        assertEquals("OTHERS", scoreboard.getNationalParties().lastKey());
-        NationalParty labParty = scoreboard.getNationalParties().get("LAB");
+        assertEquals(values().length, scoreboard.getNationalParties().size());
+        assertNotNull( scoreboard.getNationalParties().get(LAB));
+        assertNotNull( scoreboard.getNationalParties().get(OTH));
+        assertEquals(LAB, scoreboard.getNationalParties().firstKey());
+        assertEquals(OTH, scoreboard.getNationalParties().lastKey());
+        NationalPoliticalParty labParty = scoreboard.getNationalParties().get(LAB);
         assertEquals(new Long(8994), labParty.getOverallVotes());
         assertEquals(new Integer(1), labParty.getSeats());
-        NationalParty others = scoreboard.getNationalParties().get("OTHERS");
-        assertEquals(new Long(0), others.getOverallVotes());
+        NationalPoliticalParty others = scoreboard.getNationalParties().get(OTH);
+        assertEquals(new Long(517), others.getOverallVotes());
         assertEquals(new Integer(0), others.getSeats());
     }
 
@@ -164,17 +166,107 @@ public class ScoreboardServiceTest {
         scoreboardService.addConstituencyResults(constituencyResultsTwo);
         Scoreboard scoreboard = scoreboardService.getScoreboard();
 
-        assertEquals(2, scoreboard.getNationalParties().size());
-        assertNotNull( scoreboard.getNationalParties().get("LAB"));
-        assertNotNull( scoreboard.getNationalParties().get("OTHERS"));
-        assertEquals("LAB", scoreboard.getNationalParties().firstKey());
-        assertEquals("OTHERS", scoreboard.getNationalParties().lastKey());
-        NationalParty labParty = scoreboard.getNationalParties().get("LAB");
+        assertEquals(values().length, scoreboard.getNationalParties().size());
+        assertNotNull( scoreboard.getNationalParties().get(LAB));
+        assertNotNull( scoreboard.getNationalParties().get(OTH));
+
+        assertEquals(LAB, scoreboard.getNationalParties().firstKey());
+        assertEquals(OTH, scoreboard.getNationalParties().lastKey());
+
+        NationalPoliticalParty labParty = scoreboard.getNationalParties().get(LAB);
         assertEquals(new Long(17478), labParty.getOverallVotes());
         assertEquals(new Integer(2), labParty.getSeats());
         assertEquals(new Float(33.45f), labParty.getOverallShare());
-        NationalParty others = scoreboard.getNationalParties().get("OTHERS");
-        assertEquals(new Long(0), others.getOverallVotes());
+
+        NationalPoliticalParty others = scoreboard.getNationalParties().get(OTH);
+        assertEquals(new Long(517), others.getOverallVotes());
         assertEquals(new Integer(0), others.getSeats());
+    }
+
+    @Test
+    public void getScoreboardWithTruncatedParties() {
+        NationalPoliticalParty con = new NationalPoliticalParty();
+        NationalPoliticalParty lab = new NationalPoliticalParty();
+        NationalPoliticalParty snp = new NationalPoliticalParty();
+        NationalPoliticalParty ld = new NationalPoliticalParty();
+        NationalPoliticalParty dup = new NationalPoliticalParty();
+        NationalPoliticalParty sf = new NationalPoliticalParty();
+        NationalPoliticalParty pd = new NationalPoliticalParty();
+        NationalPoliticalParty sdlp = new NationalPoliticalParty();
+        NationalPoliticalParty uu = new NationalPoliticalParty();
+        NationalPoliticalParty grn = new NationalPoliticalParty();
+        NationalPoliticalParty ukip = new NationalPoliticalParty();
+        NationalPoliticalParty others = new NationalPoliticalParty();
+
+        con.setPartyCode(PoliticalPartyCode.CON);
+        con.setSeats(331);
+        con.setOverallShare(36.9f);
+        lab.setPartyCode(PoliticalPartyCode.LAB);
+        lab.setSeats(232);
+        lab.setOverallShare(30.4f);
+        snp.setPartyCode(PoliticalPartyCode.SNP);
+        snp.setSeats(56);
+        snp.setOverallShare(4.7f);
+        ld.setPartyCode(PoliticalPartyCode.LD);
+        ld.setSeats(8);
+        ld.setOverallShare(7.9f);
+        dup.setPartyCode(PoliticalPartyCode.DUP);
+        dup.setSeats(8);
+        dup.setOverallShare(0.6f);
+        sf.setPartyCode(PoliticalPartyCode.SF);
+        sf.setSeats(4);
+        sf.setOverallShare(0.6f);
+        pd.setPartyCode(PD);
+        pd.setSeats(3);
+        pd.setOverallShare(0.6f);
+        sdlp.setPartyCode(SDLP);
+        sdlp.setSeats(3);
+        sdlp.setOverallShare(0.3f);
+        uu.setPartyCode(UU);
+        uu.setSeats(2);
+        uu.setOverallShare(0.4f);
+        ukip.setPartyCode(UKIP);
+        ukip.setSeats(1);
+        ukip.setOverallShare(12.6f);
+        grn.setPartyCode(GRN);
+        grn.setSeats(1);
+        grn.setOverallShare(3.8f);
+        others.setPartyCode(OTH);
+        others.setSeats(1);
+        others.setOverallShare(0.5f);
+
+        SortedMap<PoliticalPartyCode, NationalPoliticalParty> nationalPoliticalPartySortedMap = new TreeMap<PoliticalPartyCode, NationalPoliticalParty>();
+        nationalPoliticalPartySortedMap.put(CON, con);
+        nationalPoliticalPartySortedMap.put(LAB, lab);
+        nationalPoliticalPartySortedMap.put(SNP, snp);
+        nationalPoliticalPartySortedMap.put(LD, ld);
+        nationalPoliticalPartySortedMap.put(DUP, dup);
+        nationalPoliticalPartySortedMap.put(SF, sf);
+        nationalPoliticalPartySortedMap.put(PD, pd);
+        nationalPoliticalPartySortedMap.put(SDLP, sdlp);
+        nationalPoliticalPartySortedMap.put(UU, uu);
+        nationalPoliticalPartySortedMap.put(UKIP, ukip);
+        nationalPoliticalPartySortedMap.put(GRN, grn);
+        nationalPoliticalPartySortedMap.put(OTH, others);
+
+        Scoreboard scoreboard = new Scoreboard(nationalPoliticalPartySortedMap);
+        List<NationalPoliticalParty> truncatedScores = scoreboard.getTruncatedNationalParties();
+
+        assertEquals(4, truncatedScores.size());
+        assertEquals(CON, truncatedScores.get(0).getPartyCode());
+        assertEquals(LAB, truncatedScores.get(1).getPartyCode());
+        assertEquals(SNP, truncatedScores.get(2).getPartyCode());
+        assertEquals(OTH, truncatedScores.get(3).getPartyCode());
+
+        assertEquals(new Integer(331), truncatedScores.get(0).getSeats());
+        assertEquals(new Float(36.9f), truncatedScores.get(0).getOverallShare());
+        assertEquals(new Integer(232), truncatedScores.get(1).getSeats());
+        assertEquals(new Float(30.4f), truncatedScores.get(1).getOverallShare());
+        assertEquals(new Integer(56), truncatedScores.get(2).getSeats());
+        assertEquals(new Float(4.7f), truncatedScores.get(2).getOverallShare());
+        assertEquals(new Integer(31), truncatedScores.get(3).getSeats());
+        assertEquals(new Float(27.300001f), truncatedScores.get(3).getOverallShare());
+
+
     }
 }

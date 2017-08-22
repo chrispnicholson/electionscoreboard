@@ -50,6 +50,7 @@ public class ElectionResultServiceTest {
         assertEquals(2, constituencyResult.getConstituencyId());
         assertEquals("Aberconwy", constituencyResult.getConstituencyName());
         assertEquals(7, constituencyResult.getResults().getResult().size());
+        assertEquals("LAB ", constituencyResult.getResults().getResult().first().getPartyCode());
 
     }
 
