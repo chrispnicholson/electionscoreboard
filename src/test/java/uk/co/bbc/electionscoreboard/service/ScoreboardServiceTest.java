@@ -240,7 +240,7 @@ public class ScoreboardServiceTest {
         NationalPoliticalParty labParty = scoreboard.getNationalParties().get(LAB);
         //assertEquals(new Long(17478), labParty.getOverallVotes());
         //assertEquals(new Integer(2), labParty.getSeats());
-        assertEquals(new Float(35.87f), labParty.getOverallShare());
+        assertEquals(new Float(35.86667f), labParty.getOverallShare());
 
         NationalPoliticalParty others = scoreboard.getNationalParties().get(OTH);
         //assertEquals(new Long(517), others.getOverallVotes());
