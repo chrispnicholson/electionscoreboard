@@ -31,6 +31,7 @@ public class ScoreboardServiceImpl implements ScoreboardService {
     @Override
     public void addConstituencyResults(ConstituencyResults constituencyResults) {
         System.out.println("Results called for " + constituencyResults.getConstituencyResult().getSeqNo() + ": " + constituencyResults.getConstituencyResult().getConstituencyName());
+        scoreboard.incrementConstituenciesCalled();
         SortedSet<Result> resultSortedSet = constituencyResults.getConstituencyResult().getResults().getResult();
         // top result wins the seat
         PoliticalPartyCode winner = PoliticalPartyCode.valueOf(resultSortedSet.first().getPartyCode().trim());
@@ -40,19 +41,24 @@ public class ScoreboardServiceImpl implements ScoreboardService {
         for (Result result : resultSortedSet) {
             PoliticalPartyCode politicalPartyCode = PoliticalPartyCode.valueOf(result.getPartyCode().trim());
             System.out.println("-------------------------" + result.getPartyCode() + " has " + result.getVotes() + " votes and " + result.getShare() + "% share");
-            // note: if unknown party, this goes into OTHER automatically
-            // TODO: null check here
 
-//            if (scoreboard.getNationalParties().containsKey(politicalPartyCode)) {
-//                Long overallVotes = scoreboard.getNationalParties().get(politicalPartyCode).getOverallVotes();
-//                Long newOverallVotes = new Long(overallVotes.longValue() + result.getVotes());
+            if (scoreboard.getNationalParties().containsKey(politicalPartyCode)) {
+                Long overallVotes = scoreboard.getNationalParties().get(politicalPartyCode).getOverallVotes();
+                Long newOverallVotes = new Long(overallVotes.longValue() + result.getVotes());
+                Float toBeAddedToAggregateShare = result.getShare();
+                Float currentAggregateShare = scoreboard.getNationalParties().get(politicalPartyCode).getAggregateShare();
+                scoreboard.getNationalParties().get(politicalPartyCode).setAggregateShare(toBeAddedToAggregateShare + currentAggregateShare);
+                currentAggregateShare = scoreboard.getNationalParties().get(politicalPartyCode).getAggregateShare();
 //                Float overallShare = scoreboard.getNationalParties().get(politicalPartyCode).getOverallShare();
-//                Float newOverallShare = new Float(overallShare.floatValue() + result.getShare() / scoreboard.seatsCalled());
-//
-//                scoreboard.getNationalParties().get(politicalPartyCode).setOverallVotes(newOverallVotes);
-//                scoreboard.getNationalParties().get(politicalPartyCode).setOverallShare(newOverallShare);
-//
-//            }
+//                Float newOverallShare = ((result.getShare() / 100.0f) + (overallShare / 100.0f)) /
+//                   scoreboard.seatsCalled() * 100.0f;
+                Float newOverallShare = currentAggregateShare / scoreboard.getConstituenciesCalled();
+
+
+                scoreboard.getNationalParties().get(politicalPartyCode).setOverallVotes(newOverallVotes);
+                scoreboard.getNationalParties().get(politicalPartyCode).setOverallShare(newOverallShare);
+
+            }
         }
     }
 

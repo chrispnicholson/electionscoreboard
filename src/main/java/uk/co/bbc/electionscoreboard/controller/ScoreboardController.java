@@ -1,14 +1,13 @@
 package uk.co.bbc.electionscoreboard.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uk.co.bbc.electionscoreboard.dto.ConstituencyResults;
+import uk.co.bbc.electionscoreboard.dto.Display;
 import uk.co.bbc.electionscoreboard.dto.NationalPoliticalParty;
 import uk.co.bbc.electionscoreboard.dto.Scoreboard;
 import uk.co.bbc.electionscoreboard.service.ScoreboardService;
@@ -26,10 +25,15 @@ public class ScoreboardController {
     @Autowired
     public ScoreboardService scoreboardService;
 
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, produces = {MediaType.APPLICATION_XML_VALUE})
-    public List<NationalPoliticalParty> getNationalPoliticalPartyResults() {
+    public ResponseEntity<List<Display>> getNationalPoliticalPartyResults() {
         Scoreboard scoreboard = scoreboardService.getScoreboard();
-        return scoreboard.getTruncatedNationalParties();
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.add("Content-Type", "text/xml; charset=utf-8");
+        ResponseEntity<List<Display>> response = new ResponseEntity<List<Display>>(scoreboard.getTruncatedNationalParties(), responseHeaders, HttpStatus.OK);
+        //response.
+        return response;
     }
 
     @RequestMapping(method = RequestMethod.POST, produces = {MediaType.APPLICATION_XML_VALUE})

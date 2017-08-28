@@ -12,9 +12,13 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import java.io.*;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 
@@ -27,12 +31,18 @@ public class ScoreboardClient {
     private FileReader fr;
     private InputStream in;
 
+    static {
+        Logger.getLogger("org.apache.commons.httpclient").setLevel(Level.ERROR);
+        Logger.getLogger("httpclient").setLevel(Level.ERROR);
+    }
+
     public String readFile(String file) {
 
+        Path path = FileSystems.getDefault().getPath(file);
         String content = "";
 
         try {
-            content = new String(Files.readAllBytes(Paths.get(file)));
+            content = new String(Files.readAllBytes(path.toAbsolutePath()));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -55,10 +65,8 @@ public class ScoreboardClient {
 
         try {
             HttpResponse response = client.execute(httppost);
-            System.out.println(response.toString());
             in=response.getEntity().getContent();
             String body = IOUtils.toString(in);
-            System.out.println(body);
         } catch (ClientProtocolException e) {
             System.out.println(e);
         } catch (IOException e) {
@@ -79,9 +87,6 @@ public class ScoreboardClient {
         try {
             HttpResponse response = client.execute(request);
 
-            System.out.println("Response Code : "
-                    + response.getStatusLine().getStatusCode());
-
             BufferedReader rd = new BufferedReader(
                     new InputStreamReader(response.getEntity().getContent()));
 
@@ -95,16 +100,17 @@ public class ScoreboardClient {
         return result.toString();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
+
         ScoreboardClient scoreboardClient = new ScoreboardClient();
         DecimalFormat myFormatter = new DecimalFormat("000");
 
         for (int i = 1; i <= 650; i++) {
-            System.out.println("result"+myFormatter.format(i));
-            String resultFile = "C:\\Users\\Chris\\work\\election-results\\result" + myFormatter.format(i) + ".xml";
+            String resultFile = "src/main/resources/election-results/result" + myFormatter.format(i) + ".xml";
             String xmlContent = scoreboardClient.readFile(resultFile);
             scoreboardClient.post(xmlContent);
             System.out.println(scoreboardClient.get());
+            Thread.sleep(1000l);
         }
 
     }

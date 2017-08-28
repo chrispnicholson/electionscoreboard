@@ -12,6 +12,9 @@ public class NationalPoliticalParty {
     private Long overallVotes = new Long(0l);
     private Float overallShare = new Float(0.0f);
 
+    // aggregate share - this needs divided by number of constituencies called
+    private Float aggregateShare = new Float(0.0f);
+
     public void setPartyCode(PoliticalPartyCode partyCode) {
         this.partyCode = partyCode;
     }
@@ -70,4 +73,13 @@ public class NationalPoliticalParty {
     public void addOverallShare(Float addedOverallShare) {
         this.overallShare = new Float(this.getOverallShare() + addedOverallShare);
     }
+
+    public Float getAggregateShare() {
+        return aggregateShare;
+    }
+
+    public void setAggregateShare(Float aggregateShare) {
+        this.aggregateShare = aggregateShare;
+    }
+
 }

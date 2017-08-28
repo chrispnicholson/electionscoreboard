@@ -15,25 +15,13 @@ import static uk.co.bbc.electionscoreboard.dto.PoliticalPartyCode.OTH;
 /**
  * Created by Chris on 13-Aug-17.
  */
-//@RunWith(SpringRunner.class)
 public class ScoreboardServiceTest {
-
-//    @Autowired
-//    private ScoreboardService scoreboardService;
 
     private ScoreboardService scoreboardService = new ScoreboardServiceImpl();
 
     private ConstituencyResults constituencyResultsOne;
     private ConstituencyResults constituencyResultsTwo;
-
-//    @TestConfiguration
-//    static class ScoreboardServiceImplTestContextConfiguration {
-//
-//        @Bean
-//        public ScoreboardService scoreboardService() {
-//            return new ScoreboardServiceImpl();
-//        }
-//    }
+    private ConstituencyResults constituencyResultsThree;
 
     @Before
     public void setUp() {
@@ -138,6 +126,54 @@ public class ScoreboardServiceTest {
         constituencyResultTwo.setConstituencyId(16);
         constituencyResultTwo.setConstituencyName("Arfon");
         constituencyResultsTwo.setConstituencyResult(constituencyResultTwo);
+
+        constituencyResultsThree = new ConstituencyResults();
+        ConstituencyResult constituencyResultThree = new ConstituencyResult();
+        Results resultsThree = new Results();
+        SortedSet<Result> resultSetThree = new TreeSet<Result>();
+
+        labResult = new Result();
+        labResult.setPartyCode("LAB");
+        labResult.setVotes(17195l);
+        labResult.setShare(40.70f);
+        resultSetThree.add(labResult);
+
+        conResult = new Result();
+        conResult.setPartyCode("CON");
+        conResult.setVotes(16290l);
+        conResult.setShare(38.50f);
+        resultSetThree.add(conResult);
+
+        ldResult = new Result();
+        ldResult.setPartyCode("LD");
+        ldResult.setVotes(4469l);
+        ldResult.setShare(10.60f);
+        resultSetThree.add(ldResult);
+
+        othResult = new Result();
+        othResult.setPartyCode("OTH");
+        othResult.setVotes(2565l);
+        othResult.setShare(6.10f);
+        resultSetThree.add(othResult);
+
+        ukipResult = new Result();
+        ukipResult.setPartyCode("UKIP");
+        ukipResult.setVotes(1109l);
+        ukipResult.setShare(2.60f);
+        resultSetThree.add(ukipResult);
+
+        grnResult = new Result();
+        grnResult.setPartyCode("GRN");
+        grnResult.setVotes(662l);
+        grnResult.setShare(1.60f);
+        resultSetThree.add(grnResult);
+
+        resultsThree.setResult(resultSetThree);
+        constituencyResultThree.setResults(resultsThree);
+        constituencyResultThree.setSeqNo(3);
+        constituencyResultThree.setConstituencyId(33);
+        constituencyResultThree.setConstituencyName("Basildon South &amp; East Thurrock");
+        constituencyResultsThree.setConstituencyResult(constituencyResultThree);
     }
 
     @Test
@@ -154,9 +190,11 @@ public class ScoreboardServiceTest {
         NationalPoliticalParty labParty = scoreboard.getNationalParties().get(LAB);
         assertEquals(new Long(8994), labParty.getOverallVotes());
         assertEquals(new Integer(1), labParty.getSeats());
+        assertEquals(new Float(33.0f), labParty.getOverallShare());
         NationalPoliticalParty others = scoreboard.getNationalParties().get(OTH);
         assertEquals(new Long(517), others.getOverallVotes());
         assertEquals(new Integer(0), others.getSeats());
+        assertEquals(new Float(1.9f), others.getOverallShare());
     }
 
     @Test
@@ -181,6 +219,33 @@ public class ScoreboardServiceTest {
         NationalPoliticalParty others = scoreboard.getNationalParties().get(OTH);
         assertEquals(new Long(517), others.getOverallVotes());
         assertEquals(new Integer(0), others.getSeats());
+        assertEquals(new Float(0.95f), others.getOverallShare());
+    }
+
+    @Test
+    public void getScoreboardForThreeConstituencies() {
+
+        scoreboardService.addConstituencyResults(constituencyResultsOne);
+        scoreboardService.addConstituencyResults(constituencyResultsTwo);
+        scoreboardService.addConstituencyResults(constituencyResultsThree);
+        Scoreboard scoreboard = scoreboardService.getScoreboard();
+
+        assertEquals(values().length, scoreboard.getNationalParties().size());
+        assertNotNull( scoreboard.getNationalParties().get(LAB));
+        assertNotNull( scoreboard.getNationalParties().get(OTH));
+
+        assertEquals(LAB, scoreboard.getNationalParties().firstKey());
+        assertEquals(OTH, scoreboard.getNationalParties().lastKey());
+
+        NationalPoliticalParty labParty = scoreboard.getNationalParties().get(LAB);
+        //assertEquals(new Long(17478), labParty.getOverallVotes());
+        //assertEquals(new Integer(2), labParty.getSeats());
+        assertEquals(new Float(35.87f), labParty.getOverallShare());
+
+        NationalPoliticalParty others = scoreboard.getNationalParties().get(OTH);
+        //assertEquals(new Long(517), others.getOverallVotes());
+        //assertEquals(new Integer(0), others.getSeats());
+        //assertEquals(new Float(0.95f), others.getOverallShare());
     }
 
     @Test
@@ -250,22 +315,22 @@ public class ScoreboardServiceTest {
         nationalPoliticalPartySortedMap.put(OTH, others);
 
         Scoreboard scoreboard = new Scoreboard(nationalPoliticalPartySortedMap);
-        List<NationalPoliticalParty> truncatedScores = scoreboard.getTruncatedNationalParties();
+        List<Display> truncatedScores = scoreboard.getTruncatedNationalParties();
 
         assertEquals(4, truncatedScores.size());
-        assertEquals(CON, truncatedScores.get(0).getPartyCode());
-        assertEquals(LAB, truncatedScores.get(1).getPartyCode());
-        assertEquals(SNP, truncatedScores.get(2).getPartyCode());
-        assertEquals(OTH, truncatedScores.get(3).getPartyCode());
+        assertEquals(CON.name(), truncatedScores.get(0).getPartyCode());
+        assertEquals(LAB.name(), truncatedScores.get(1).getPartyCode());
+        assertEquals(SNP.name(), truncatedScores.get(2).getPartyCode());
+        assertEquals(OTH.name(), truncatedScores.get(3).getPartyCode());
 
-        assertEquals(new Integer(331), truncatedScores.get(0).getSeats());
-        assertEquals(new Float(36.9f), truncatedScores.get(0).getOverallShare());
-        assertEquals(new Integer(232), truncatedScores.get(1).getSeats());
-        assertEquals(new Float(30.4f), truncatedScores.get(1).getOverallShare());
-        assertEquals(new Integer(56), truncatedScores.get(2).getSeats());
-        assertEquals(new Float(4.7f), truncatedScores.get(2).getOverallShare());
-        assertEquals(new Integer(31), truncatedScores.get(3).getSeats());
-        assertEquals(new Float(27.300001f), truncatedScores.get(3).getOverallShare());
+        assertEquals(331, truncatedScores.get(0).getSeats());
+        assertEquals("36.90", truncatedScores.get(0).getVoteShare());
+        assertEquals(232, truncatedScores.get(1).getSeats());
+        assertEquals("30.40", truncatedScores.get(1).getVoteShare());
+        assertEquals(56, truncatedScores.get(2).getSeats());
+        assertEquals("4.70", truncatedScores.get(2).getVoteShare());
+        assertEquals(31, truncatedScores.get(3).getSeats());
+        assertEquals("27.30", truncatedScores.get(3).getVoteShare());
 
 
     }

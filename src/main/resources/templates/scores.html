@@ -1,17 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Election Scores</title>
+    <meta http-equiv="refresh" content="5">
 </head>
-<body>
-<script type="text/javascript">
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", "http://localhost:8080/scores?format=application/xml", false);
+<style>
+table,th,td {
+  border : 1px solid black;
+  border-collapse: collapse;
+}
+th,td {
+  padding: 5px;
+}
+</style>
+<body onload="loadXMLDoc()">
 
-        xhr.send();
-        document.write(xhr.status+"<br>");
-        document.write(xhr.statusText);
+<table id="demo"></table>
+
+<script>
+function loadXMLDoc() {
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      myFunction(this);
+    }
+  };
+  xmlhttp.open("GET", "http://localhost:8080/scores", true);
+  xmlhttp.send();
+}
+function myFunction(xml) {
+  var i;
+  var xmlDoc = xml.responseXML;
+  var table="<tr><th>Party</th><th>Seats</th><th>Vote share</th></tr>";
+  var x = xmlDoc.getElementsByTagName("item");
+  for (i = 0; i <x.length; i++) {
+    var partyCode = x[i].getElementsByTagName("partyCode")[0].childNodes[0].nodeValue;
+    var seats = x[i].getElementsByTagName("seats")[0].childNodes[0].nodeValue;
+    var voteShare = x[i].getElementsByTagName("voteShare")[0].childNodes[0].nodeValue;
+    if (seats > 325) {
+        table += "<tr style=\"background-color:red\"><td>" + partyCode + "</td><td>" + seats + "</td><td>" + voteShare + "</td></tr>";
+    } else {
+        table += "<tr><td>" + partyCode + "</td><td>" + seats + "</td><td>" + voteShare + "</td></tr>";
+    }
+
+  }
+  document.getElementById("demo").innerHTML = table;
+}
 </script>
+
 </body>
 </html>
